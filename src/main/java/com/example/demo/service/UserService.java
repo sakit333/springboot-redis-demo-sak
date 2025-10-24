@@ -19,7 +19,7 @@ public class UserService {
 
     // Save user with TTL 10 minutes and track insertion order
     public void saveUser(User user) {
-        redisTemplate.opsForValue().set(PREFIX + user.getId(), user, 10, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(PREFIX + user.getId(), user, 1, TimeUnit.MINUTES);
         redisTemplate.opsForList().rightPush("USER_ORDER", user.getId());
     }
 
