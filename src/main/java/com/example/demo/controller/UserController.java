@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 public class UserController {
 
@@ -14,21 +16,19 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/")
-    public String home() {
+    public String home(Model model) {
+        List<User> allUsers = userService.getAllUsersInOrder();
+        model.addAttribute("allUsers", allUsers);
         return "index";
     }
 
-    // Add user → clears any previously fetched user
     @PostMapping("/save")
     public String saveUser(@ModelAttribute User user, Model model) {
         userService.saveUser(user);
         model.addAttribute("successMessage", "✅ User added successfully!");
-        // Ensure no user info is shown after adding
-        model.addAttribute("user", null);
-        return "index";
+        return "redirect:/"; // Redirect to refresh the page and show updated list
     }
 
-    // Fetch user by ID → only shows when fetched
     @PostMapping("/fetch")
     public String fetchUser(@RequestParam String id, Model model) {
         User user = userService.getUser(id);
@@ -37,16 +37,17 @@ public class UserController {
         } else {
             model.addAttribute("errorMessage", "❌ No user found with ID: " + id);
         }
+        List<User> allUsers = userService.getAllUsersInOrder();
+        model.addAttribute("allUsers", allUsers);
         return "index";
     }
 
-    // Delete user → only deletes currently fetched user
     @PostMapping("/delete")
     public String deleteUser(@RequestParam String id, Model model) {
         userService.deleteUser(id);
         model.addAttribute("successMessage", "🗑️ User deleted successfully!");
-        // Clear displayed user after deletion
-        model.addAttribute("user", null);
+        List<User> allUsers = userService.getAllUsersInOrder();
+        model.addAttribute("allUsers", allUsers);
         return "index";
     }
 }
